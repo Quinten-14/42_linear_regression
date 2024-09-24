@@ -1,6 +1,5 @@
 import json
 import sys
-import csv
 
 def getThetas():
     try:
@@ -14,23 +13,13 @@ def getThetas():
 
 def getEdges():
     try:
-        with open("data.csv", "r") as file:
-            reader = csv.DictReader(file)
-            kms = [int(row["km"]) for row in reader]
-
-            if kms:
-                least = min(kms)
-                highest = max(kms)
-                return least, highest
-            else:
-                return None, None
-
+        with open("theta.json", "r") as file:
+            content = json.load(file)
     except FileNotFoundError:
-        print("The file data.csv is not found")
-        return None, None
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return None, None
+        print("The file theta.json does not exist.")
+        sys.exit(1)
+
+    return content["minMileage"], content["maxMileage"]
 
 
 def scaler(x):
