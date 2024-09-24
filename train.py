@@ -1,6 +1,7 @@
 import csv
 import json
 import os
+import pandas as pd
 
 default_theta = {
     "theta0": 0,
@@ -103,6 +104,23 @@ def fillMaxAndMin() :
         print(f"An error occurred while processing data.csv: {e}")
         return
 
+class   calculations:
+    def __init__(self):
+        self.rate = 0.1
+        self.theta0 = 0
+        self.theta1 = 0
+        self.data = pd.read_csv("data.csv").values.tolist()
+        self.mileages = [row[0] for row in self.data]
+        self.prices = [row[1] for row in self.data]
+        self.samples = len(self.data)
+
+        # Needed for scaling
+        self.averageMileage = sum(self.mileages) / len(self.mileages)
+        self.mileageDev = (sum((mileage - self.averageMileage) ** 2 for mileage in self.mileages) / len(self.mileages)) ** 0.5
+
+        # Scalers
+        self.scaled_mileages = [(mileage - self.averageMileage) / self.mileageDev for mileage in self.mileages]
+
 
 def main() :
     if dataChecker() == False:
@@ -110,6 +128,8 @@ def main() :
 
     jsonChecker()
     fillMaxAndMin()
+
+    calc = calculations()
 
 if __name__ == '__main__' :
     main()
