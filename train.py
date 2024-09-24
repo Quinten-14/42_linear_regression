@@ -1,5 +1,66 @@
 import csv
 import json
+import os
+
+default_theta = {
+    "theta0": 0,
+    "theta1": 0,
+    "maxMileage": None,
+    "minMileage": None
+}
+
+def jsonChecker() :
+    try:
+        with open("theta.json", "w") as file:
+            json.dump(default_theta, file, indent=4)
+
+        print("theta.json was created or reset with default values.")
+
+    except Exception as e:
+            print(f"An error occurred while creating or resetting theta.json: {e}")
+
+def dataChecker():
+    try:
+        if not os.path.exists("data.csv"):
+            print("data.csv does not exist.")
+            return False
+
+        with open("data.csv", "r") as file:
+            reader = csv.reader(file)
+            rows = list(reader)
+
+            if len(rows) == 0:
+                print("data.csv is empty")
+                return False
+
+            header = rows[0]
+            expected_header = ["km", "price"]
+            if header != expected_header:
+                print("data.csv has an invalid header or no header at all")
+                return False
+
+            if len(rows) < 2:
+                print("data.csv needs minimum one data point")
+                return False
+
+            for i, row in enumerate(rows[1:], start=2):
+                if len(row) != 2:
+                    print(f"Invalid row {i} in data.csv. Each datapoint should have 2 values")
+                    return False
+
+                try:
+                    km = float(row[0])
+                    price = float(row[1])
+                except ValueError:
+                    print(f"Invalid data in row {i}. Both 'km' and 'price' should be numeric")
+                    return False
+
+            return True
+
+    except Exception as e:
+        print(f"An error occurred while checking data.csv: {e}")
+        return False
+
 
 def fillMaxAndMin() :
     try:
@@ -44,6 +105,10 @@ def fillMaxAndMin() :
 
 
 def main() :
+    if dataChecker() == False:
+        return
+
+    jsonChecker()
     fillMaxAndMin()
 
 if __name__ == '__main__' :
